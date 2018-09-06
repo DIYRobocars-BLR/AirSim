@@ -1,12 +1,20 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(MavLinkCom)
 
-add_subdirectory("MavLinkTest")
+#add_subdirectory("MavLinkTest")
 
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake-modules") 
 INCLUDE("${CMAKE_CURRENT_LIST_DIR}/../cmake-modules/CommonSetup.cmake")
 CommonSetup()
 
+
+###########
+## Build ##
+###########
+
+## Specify additional locations of header files
+## Your package locations should be listed before other locations
+# include_directories(include)
 include_directories(
   ${AIRSIM_ROOT}/MavLinkCom
   ${AIRSIM_ROOT}/MavLinkCom/common_utils

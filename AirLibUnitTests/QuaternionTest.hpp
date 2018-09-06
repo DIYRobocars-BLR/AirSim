@@ -3,6 +3,7 @@
 
 #include "TestBase.hpp"
 #include "common/Common.hpp"
+#include <math.h>
 
 namespace msr { namespace airlib {
 
@@ -24,15 +25,15 @@ private:
         if (rotAxis.squaredNorm() == 0)
             rotAxis = VectorMath::up();
         float dot = VectorMath::front().dot(toVector);
-        float ang = std::acosf(dot);
+        float ang = acosf(dot);
 
         return VectorMath::toQuaternion(rotAxis, ang);
     }
 
     Quaternionr toQuaternion(const Vector3r& axis, float angle) {
-        auto s = std::sinf(angle / 2);
+        auto s = sinf(angle / 2);
         auto u = axis.normalized();
-        return Quaternionr(std::cosf(angle / 2), u.x() * s, u.y() * s, u.z() * s);
+        return Quaternionr(cosf(angle / 2), u.x() * s, u.y() * s, u.z() * s);
     }
 
     void lookAtTest()

@@ -5,26 +5,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 pushd "$SCRIPT_DIR"  >/dev/null
 
 set -e
-# set -x
-
-#check for correct verion of llvm
-if [[ ! -d "llvm-source-50" ]]; then
-    if [[ -d "llvm-source-39" ]]; then
-        echo "Hello there! We just upgraded AirSim to Unreal Engine 4.18."
-        echo "Here are few easy steps for upgrade so everything is new and shiny :)"
-        echo "https://github.com/Microsoft/AirSim/blob/master/docs/unreal_upgrade.md"
-        exit 1
-    else
-        echo "The llvm-souce-50 folder was not found! Mystery indeed."
-    fi
-fi
-
-# check for libc++
-if [[ !(-d "./llvm-build/output/lib") ]]; then
-    echo "ERROR: clang++ and libc++ is necessary to compile AirSim and run it in Unreal engine"
-    echo "Please run setup.sh first."
-    exit 1
-fi
+set -x
 
 # check for rpclib
 if [ ! -d "./external/rpclib/rpclib-2.2.1" ]; then
@@ -40,23 +21,14 @@ if [ ! -d "./cmake_build" ]; then
     exit 1
 fi
 
+# build settings
+export CC=/usr/bin/gcc
+export CXX=/usr/bin/g++
 
-# set up paths of cc and cxx compiler
-if [ "$1" == "gcc" ]; then
-    export CC="gcc"
-    export CXX="g++"
+if [ "$(uname)" == "Darwin" ]; then
+    CMAKE="$(greadlink -f cmake_build/bin/cmake)"
 else
-    if [ "$(uname)" == "Darwin" ]; then
-        CMAKE="$(greadlink -f cmake_build/bin/cmake)"
-
-        export CC=/usr/local/opt/llvm-5.0/bin/clang-5.0
-        export CXX=/usr/local/opt/llvm-5.0/bin/clang++-5.0
-    else
-        CMAKE="$(readlink -f cmake_build/bin/cmake)"
-
-        export CC="clang-5.0"
-        export CXX="clang++-5.0"
-    fi
+    CMAKE="$(readlink -f cmake_build/bin/cmake)"
 fi
 
 #install EIGEN library
@@ -82,8 +54,8 @@ if [[ ! -d $build_dir ]]; then
     mkdir -p $build_dir
     pushd $build_dir  >/dev/null
 
-    "$CMAKE" ../cmake -DCMAKE_BUILD_TYPE=Debug \
-        || (popd && rm -r $build_dir && exit 1)
+    cmake ../cmake -DCMAKE_BUILD_TYPE=Debug # \
+        # || (popd && rm -r $build_dir && exit 1)
     popd >/dev/null
 fi
 
@@ -122,7 +94,7 @@ echo " AirSim plugin is built! Here's how to build Unreal project."
 echo "=================================================================="
 echo "If you are using Blocks environment, its already updated."
 echo "If you are using your own environment, update plugin using,"
-echo "rsync -a --delete Unreal/Plugins path/to/MyUnrealProject"
+echo "rsync -t -r Unreal/Plugins path/to/MyUnrealProject"
 echo ""
 echo "For help see:"
 echo "https://github.com/Microsoft/AirSim/blob/master/docs/build_linux.md"
